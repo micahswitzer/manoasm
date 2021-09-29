@@ -39,7 +39,7 @@ pub const Token = struct {
         .{ "ion", .insn_ion },
         .{ "iof", .insn_iof },
         .{ "org", .keyword_org },
-        .{ "dw", .keyword_dw },
+        .{ "dat", .keyword_dat },
     });
 
     pub fn getKeyword(bytes: []const u8) ?Tag {
@@ -79,7 +79,7 @@ pub const Token = struct {
         insn_sko,
         insn_ion,
         insn_iof,
-        keyword_dw,
+        keyword_dat,
         keyword_org,
     };
 

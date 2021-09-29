@@ -12,22 +12,22 @@ lop: ; main loop
     bun lop
     sta sum
     hlt
-ads: dw ops
-ptr: dw 0
-nbr: dw -0xa
-ctr: dw 0
-sum: dw 0
+ads: dat ops
+ptr: dat 0
+nbr: dat -0xa
+ctr: dat 0
+sum: dat 0
 ops:
-    dw 0
-    dw 1
-    dw 2
-    dw 3
-    dw 4
-    dw 5
-    dw 6
-    dw 7
-    dw 8
-    dw 9
+    dat 0
+    dat 1
+    dat 2
+    dat 3
+    dat 4
+    dat 5
+    dat 6
+    dat 7
+    dat 8
+    dat 9
 
 end ; is this necessary?
 
