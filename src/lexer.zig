@@ -282,8 +282,11 @@ pub const Lexer = struct {
                         break;
                     },
                     else => {
-                        // TODO detect if this is a special case
-                        result.tag = .identifier;
+                        if (Token.getKeyword(self.buffer[result.loc.start..self.index])) |ident| {
+                            result.tag = ident;
+                        } else {
+                            result.tag = .identifier;
+                        }
                         break;
                     },
                 },
@@ -319,6 +322,10 @@ test "lexer - numbers" {
     try testLex("0x", &.{ .invalid });
     try testLex("0b", &.{ .invalid });
     try testLex("0", &.{ .number });
+}
+
+test "lexer - keywords" {
+    try testLex("dat guy", &.{ .keyword_dat, .identifier });
 }
 
 // taken verbatim from the Zig standard library source
