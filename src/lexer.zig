@@ -107,7 +107,9 @@ pub const Lexer = struct {
         identifier,
         num_maybe_neg,
         num_zero,
+        num_maybe_bin,
         num_bin,
+        num_maybe_hex,
         num_hex,
         num_oct,
         num_dec,
@@ -181,7 +183,6 @@ pub const Lexer = struct {
                     else => {
                         result.tag = .invalid;
                         result.loc.end = self.index;
-                        self.index += 1;
                         return result;
                     },
                 },
@@ -190,10 +191,15 @@ pub const Lexer = struct {
                         state = .num_oct;
                     },
                     'b' => {
-                        state = .num_bin;
+                        state = .num_maybe_bin;
                     },
                     'x' => {
-                        state = .num_hex;
+                        state = .num_maybe_hex;
+                    },
+                    '8'...'9', 'a', 'c'...'w', 'y'...'z', 'A'...'Z', '_' => {
+                        result.tag = .invalid;
+                        result.loc.end = self.index;
+                        return result;
                     },
                     else => {
                         result.tag = .number;
@@ -202,20 +208,55 @@ pub const Lexer = struct {
                 },
                 .num_oct => switch (c) {
                     '0'...'7' => {}, // continue
+                    '8'...'9', 'a'...'z', 'A'...'Z', '_' => {
+                        result.tag = .invalid;
+                        result.loc.end = self.index;
+                        return result;
+                    },
                     else => {
                         result.tag = .number;
                         break;
                     },
+                },
+                .num_maybe_bin => switch (c) {
+                    '0', '1' => {
+                        state = .num_bin;
+                    },
+                    else => {
+                        result.tag = .invalid;
+                        result.loc.end = self.index;
+                        return result;
+                    }
                 },
                 .num_bin => switch (c) {
                     '0', '1' => {}, // continue
+                    '2'...'9', 'a'...'z', 'A'...'Z', '_' => {
+                        result.tag = .invalid;
+                        result.loc.end = self.index;
+                        return result;
+                    },
                     else => {
                         result.tag = .number;
                         break;
                     },
                 },
+                .num_maybe_hex => switch (c) {
+                    '0'...'9', 'a'...'f', 'A'...'F' => {
+                        state = .num_hex;
+                    },
+                    else => {
+                        result.tag = .invalid;
+                        result.loc.end = self.index;
+                        return result;
+                    }
+                },
                 .num_hex => switch (c) {
                     '0'...'9', 'a'...'f', 'A'...'F' => {}, // continue
+                    'g'...'z', 'G'...'Z', '_' => {
+                        result.tag = .invalid;
+                        result.loc.end = self.index;
+                        return result;
+                    },
                     else => {
                         result.tag = .number;
                         break;
@@ -223,6 +264,11 @@ pub const Lexer = struct {
                 },
                 .num_dec => switch (c) {
                     '0'...'9' => {}, // continue
+                    'a'...'z', 'A'...'Z', '_' => {
+                        result.tag = .invalid;
+                        result.loc.end = self.index;
+                        return result;
+                    },
                     else => {
                         result.tag = .number;
                         break;
@@ -265,14 +311,14 @@ test "lexer - label" {
 }
 
 test "lexer - numbers" {
-    try testInvalidLex("-i");
-    try testInvalidLex("0xx");
-    try testInvalidLex("0b12");
-    try testInvalidLex("08");
-}
-
-fn testInvalidLex(source: [:0]const u8) !void {
-    return testLex(source, &.{.invalid});
+    try testLex("-i", &.{ .invalid, .identifier });
+    try testLex("0xx", &.{ .invalid, .identifier });
+    try testLex("0b12", &.{ .invalid, .number });
+    try testLex("08", &.{ .invalid, .number });
+    try testLex("-", &.{ .invalid });
+    try testLex("0x", &.{ .invalid });
+    try testLex("0b", &.{ .invalid });
+    try testLex("0", &.{ .number });
 }
 
 // taken verbatim from the Zig standard library source
