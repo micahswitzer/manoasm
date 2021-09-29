@@ -81,7 +81,18 @@ pub const Token = struct {
         insn_iof,
         keyword_dat,
         keyword_org,
+
+        pub fn isDirective(self: *@This()) bool {
+            return switch (self.*) {
+                .invalid, .identifier, .label, .l_bracket, .r_bracket, .number, .eof => false,
+                else => true,
+            };
+        }
     };
+
+    pub fn isDirective(self: *@This()) bool {
+        return self.tag.isDirective();
+    }
 
 };
 
@@ -100,6 +111,10 @@ pub const Lexer = struct {
             .buffer = buffer,
             .index = 0,
         };
+    }
+
+    pub fn getSlice(self: *const Self, token: *const Token) []const u8 {
+        return self.buffer[token.loc.start..token.loc.end];
     }
 
     const State = enum {
