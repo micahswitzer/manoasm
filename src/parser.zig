@@ -57,6 +57,7 @@ const Line = struct {
     instruction: Instruction,
 };
 
+/// Just a fun recursive descent parser
 pub const Parser = struct {
     lexer: *Lexer,
     _next_tok: LexToken,

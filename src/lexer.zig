@@ -93,7 +93,6 @@ pub const Token = struct {
     pub fn isDirective(self: *@This()) bool {
         return self.tag.isDirective();
     }
-
 };
 
 pub const Lexer = struct {
@@ -107,7 +106,7 @@ pub const Lexer = struct {
     }
 
     pub fn init(buffer: [:0]const u8) Self {
-        return Lexer {
+        return Lexer{
             .buffer = buffer,
             .index = 0,
         };
@@ -135,7 +134,7 @@ pub const Lexer = struct {
         // start at the begining
         var state: State = .start;
         // default result
-        var result = Token {
+        var result = Token{
             .tag = .eof,
             .loc = .{
                 .start = self.index,
@@ -241,7 +240,7 @@ pub const Lexer = struct {
                         result.tag = .invalid;
                         result.loc.end = self.index;
                         return result;
-                    }
+                    },
                 },
                 .num_bin => switch (c) {
                     '0', '1' => {}, // continue
@@ -263,7 +262,7 @@ pub const Lexer = struct {
                         result.tag = .invalid;
                         result.loc.end = self.index;
                         return result;
-                    }
+                    },
                 },
                 .num_hex => switch (c) {
                     '0'...'9', 'a'...'f', 'A'...'F' => {}, // continue
@@ -325,7 +324,7 @@ pub const Lexer = struct {
 };
 
 test "lexer - label" {
-    try testLex("label1: ident", &.{.label, .identifier});
+    try testLex("label1: ident", &.{ .label, .identifier });
 }
 
 test "lexer - numbers" {
@@ -333,10 +332,10 @@ test "lexer - numbers" {
     try testLex("0xx", &.{ .invalid, .identifier });
     try testLex("0b12", &.{ .invalid, .number });
     try testLex("08", &.{ .invalid, .number });
-    try testLex("-", &.{ .invalid });
-    try testLex("0x", &.{ .invalid });
-    try testLex("0b", &.{ .invalid });
-    try testLex("0", &.{ .number });
+    try testLex("-", &.{.invalid});
+    try testLex("0x", &.{.invalid});
+    try testLex("0b", &.{.invalid});
+    try testLex("0", &.{.number});
 }
 
 test "lexer - keywords" {
