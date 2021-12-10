@@ -102,7 +102,7 @@ pub const Lexer = struct {
     const Self = @This();
 
     pub fn dump(self: *Self, token: *const Token) void {
-        std.debug.warn("{s} \"{s}\"\n", .{ @tagName(token.tag), self.buffer[token.loc.start..token.loc.end] });
+        std.log.info("{s} \"{s}\"", .{ @tagName(token.tag), self.buffer[token.loc.start..token.loc.end] });
     }
 
     pub fn init(buffer: [:0]const u8) Self {
